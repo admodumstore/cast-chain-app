@@ -2,6 +2,8 @@
 
 Connect two actors through shared movie/TV credits in the fewest steps — a "Six Degrees" puzzle game. This is a Capacitor-wrapped version of the web prototype: the game itself (`www/`) is plain HTML/CSS/JS with no build step, and Capacitor wraps it into installable iOS and Android projects.
 
+**Status:** Android is done and confirmed working (built and ran successfully in the Android Studio emulator on a Linux machine). iOS hasn't been touched yet — that's the next task, to be done on a Mac with Xcode. The coffee link in `www/index.html` is already set to the real URL. Nothing else is pending; this README plus the code is the full picture, no other context needed.
+
 ## What's here
 
 - `www/` — the actual game. `index.html` + `styles.css` + `app.js` (game logic) + `data.js` (the dataset: ~3,000 titles / ~12,000 actors pulled from TMDb).
