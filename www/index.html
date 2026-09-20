@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Cast Chain</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Work+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="wrap">
+
+  <header class="marquee">
+    <h1 class="marquee__title">CAST&nbsp;CHAIN</h1>
+    <p class="marquee__tag">Two actors. Zero shared credits. Shortest path wins.</p>
+    <p class="howto">
+      Click a title the current actor appeared in, then a co-star from that title — repeat until you reach
+      the actor on the right. Fewer movies/shows used is a better score.
+    </p>
+  </header>
+
+  <div class="sprockets" aria-hidden="true"></div>
+
+  <main class="board">
+
+    <div class="plates">
+      <div class="plate plate--start">
+        <div class="plate__eyebrow">Start</div>
+        <div class="plate__name" id="plate-start">—</div>
+      </div>
+      <div class="plate plate--target">
+        <div class="plate__eyebrow">Reach</div>
+        <div class="plate__name" id="plate-target">—</div>
+      </div>
+    </div>
+
+    <div class="stats">
+      <span>STEPS: <b id="stat-steps">0</b></span>
+      <span id="stat-difficulty">DIFFICULTY: <b>—</b></span>
+      <span class="stat--score">SCORE: <b id="stat-score">0</b></span>
+    </div>
+
+    <div class="chain" id="chain" role="list" aria-label="Your chain so far"></div>
+
+    <section class="picker" id="picker">
+      <p class="picker__prompt" id="picker-prompt">&nbsp;</p>
+      <input type="search" id="picker-filter" placeholder="Search…" autocomplete="off" />
+      <div class="picker__list" id="picker-list"></div>
+    </section>
+
+    <div class="win" id="win-panel" hidden>
+      <p class="win__headline" id="win-headline">Solved!</p>
+      <p class="win__detail" id="win-detail"></p>
+      <p class="win__score" id="win-score"></p>
+      <p class="win__best" id="win-best" hidden>New personal best!</p>
+      <button type="button" class="text-link" id="win-reveal-link" hidden>See the shortest path</button>
+      <div class="win__optimal-chain" id="win-optimal-chain" hidden></div>
+      <button type="button" class="btn btn--primary" id="win-next">New Puzzle</button>
+    </div>
+
+    <div class="actions">
+      <button type="button" class="btn" id="btn-restart">Restart Chain</button>
+      <button type="button" class="btn" id="btn-giveup">Give Up</button>
+      <button type="button" class="btn" id="btn-new">New Puzzle</button>
+    </div>
+
+  </main>
+
+  <div class="sprockets" aria-hidden="true"></div>
+
+  <footer class="support">
+    <a href="https://buymeacoffee.com/admodum" target="_blank" rel="noopener">Support the developer</a>
+  </footer>
+
+</div>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
