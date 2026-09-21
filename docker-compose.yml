@@ -1,0 +1,7 @@
+services:
+  cast-chain:
+    build: .
+    container_name: cast-chain
+    restart: unless-stopped
+    ports:
+      - "8192:80"
