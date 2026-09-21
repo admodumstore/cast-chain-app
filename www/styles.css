@@ -400,6 +400,114 @@
   }
   .support a:hover { color: var(--marquee-glow); }
 
+  .text-link--center {
+    display: block;
+    width: 100%;
+    text-align: center;
+    margin: 4px 0 0;
+  }
+
+  /* ---- choose-your-own-actors panel ---- */
+  .custom-setup {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 20px 16px;
+  }
+
+  .custom-setup__title {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 1.3rem;
+    margin: 0;
+    text-align: center;
+  }
+
+  .custom-setup__hint {
+    color: var(--muted);
+    font-size: 0.85rem;
+    margin: -8px 0 0;
+    text-align: center;
+  }
+
+  .custom-setup__label {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+
+  .custom-setup__field input[type="search"] {
+    width: 100%;
+    font: inherit;
+    font-size: 0.95rem;
+    padding: 10px 12px;
+    border-radius: 6px;
+    border: 1px solid var(--line);
+    background: var(--ink);
+    color: var(--paper);
+  }
+  .custom-setup__field input[type="search"]:focus {
+    outline: 2px solid var(--marquee);
+    outline-offset: 1px;
+  }
+  .custom-setup__field input[type="search"]::placeholder { color: var(--muted); }
+
+  .custom-setup__list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-height: 200px;
+    overflow-y: auto;
+    margin-top: 8px;
+  }
+
+  .custom-setup__chosen {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 6px;
+    background: var(--velvet-soft);
+    border: 1px solid var(--velvet);
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  .chip-clear {
+    font: inherit;
+    font-size: 1.1rem;
+    line-height: 1;
+    background: none;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    padding: 2px 4px;
+  }
+  .chip-clear:hover { color: var(--marquee-glow); }
+
+  .custom-setup__message {
+    min-height: 1.2em;
+    font-size: 0.88rem;
+    color: var(--muted);
+    text-align: center;
+    margin: 0;
+  }
+  .custom-setup__message--error { color: var(--velvet); }
+  .custom-setup__message--ready { color: var(--good); }
+
+  .custom-setup__actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+  }
+
   [hidden] { display: none !important; }
 
   @media (max-width: 480px) {

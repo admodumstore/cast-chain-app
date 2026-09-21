@@ -24,7 +24,7 @@
 
   <div class="sprockets" aria-hidden="true"></div>
 
-  <main class="board">
+  <main class="board" id="board">
 
     <div class="plates">
       <div class="plate plate--start">
@@ -67,7 +67,41 @@
       <button type="button" class="btn" id="btn-new">New Puzzle</button>
     </div>
 
+    <button type="button" class="text-link text-link--center" id="btn-custom">Choose your own actors</button>
+
   </main>
+
+  <section class="custom-setup" id="custom-setup" hidden>
+    <p class="custom-setup__title">Pick your own two actors</p>
+    <p class="custom-setup__hint">They can't have starred in anything together — that's the puzzle.</p>
+
+    <div class="custom-setup__field">
+      <div class="custom-setup__label">Start</div>
+      <div class="custom-setup__chosen" id="custom-start-chosen" hidden>
+        <span id="custom-start-chosen-name"></span>
+        <button type="button" class="chip-clear" id="custom-start-clear" aria-label="Clear start actor">×</button>
+      </div>
+      <input type="search" id="custom-start-input" placeholder="Search actor…" autocomplete="off" />
+      <div class="custom-setup__list" id="custom-start-list"></div>
+    </div>
+
+    <div class="custom-setup__field">
+      <div class="custom-setup__label">Reach</div>
+      <div class="custom-setup__chosen" id="custom-target-chosen" hidden>
+        <span id="custom-target-chosen-name"></span>
+        <button type="button" class="chip-clear" id="custom-target-clear" aria-label="Clear reach actor">×</button>
+      </div>
+      <input type="search" id="custom-target-input" placeholder="Search actor…" autocomplete="off" />
+      <div class="custom-setup__list" id="custom-target-list"></div>
+    </div>
+
+    <p class="custom-setup__message" id="custom-setup-message"></p>
+
+    <div class="custom-setup__actions">
+      <button type="button" class="btn" id="custom-cancel">Cancel</button>
+      <button type="button" class="btn btn--primary" id="custom-start-btn" disabled>Start Puzzle</button>
+    </div>
+  </section>
 
   <div class="sprockets" aria-hidden="true"></div>
 

@@ -145,6 +145,7 @@
   let bestRoundScore = loadBestScore();
 
   const el = {
+    board: document.getElementById("board"),
     start: document.getElementById("plate-start"),
     target: document.getElementById("plate-target"),
     steps: document.getElementById("stat-steps"),
@@ -162,6 +163,19 @@
     winBest: document.getElementById("win-best"),
     winRevealLink: document.getElementById("win-reveal-link"),
     winOptimalChain: document.getElementById("win-optimal-chain"),
+    customPanel: document.getElementById("custom-setup"),
+    customStartInput: document.getElementById("custom-start-input"),
+    customStartList: document.getElementById("custom-start-list"),
+    customStartChosen: document.getElementById("custom-start-chosen"),
+    customStartChosenName: document.getElementById("custom-start-chosen-name"),
+    customStartClear: document.getElementById("custom-start-clear"),
+    customTargetInput: document.getElementById("custom-target-input"),
+    customTargetList: document.getElementById("custom-target-list"),
+    customTargetChosen: document.getElementById("custom-target-chosen"),
+    customTargetChosenName: document.getElementById("custom-target-chosen-name"),
+    customTargetClear: document.getElementById("custom-target-clear"),
+    customMessage: document.getElementById("custom-setup-message"),
+    customStartBtn: document.getElementById("custom-start-btn"),
   };
 
   function usedActors() {
@@ -174,19 +188,32 @@
     return chain[chain.length - 1];
   }
 
-  function startNewPuzzle() {
-    puzzle = pickPuzzle();
+  // Random mode caps difficulty at 4 steps, but a deliberately-chosen pair
+  // (via "Choose your own actors") can be any distance apart — cap the dots
+  // display at 4 filled and spell out the exact count above that.
+  function renderDifficulty(optimal) {
+    const filled = Math.min(Math.max(optimal - 1, 0), 4);
+    const extra = optimal > 4 ? " · " + optimal + " steps" : "";
+    return "DIFFICULTY: <b>" + "●".repeat(filled) + "○".repeat(4 - filled) + "</b>" + extra;
+  }
+
+  function beginPuzzle(p) {
+    puzzle = p;
     chain = [puzzle.start];
     solved = false;
     gaveUp = false;
     el.start.textContent = puzzle.start;
     el.target.textContent = puzzle.target;
-    el.difficulty.innerHTML = "DIFFICULTY: <b>" + "●".repeat(puzzle.optimal - 1) + "○".repeat(4 - puzzle.optimal) + "</b>";
+    el.difficulty.innerHTML = renderDifficulty(puzzle.optimal);
     el.win.hidden = true;
     el.win.classList.remove("win--reveal");
     resetWinExtras();
     el.picker.hidden = false;
     render();
+  }
+
+  function startNewPuzzle() {
+    beginPuzzle(pickPuzzle());
   }
 
   function restartChain() {
@@ -340,6 +367,141 @@
       .join('<span class="chip chip--link" aria-hidden="true">→</span>');
     el.winOptimalChain.hidden = false;
     el.winRevealLink.hidden = true;
+  });
+
+  // ---- choose-your-own-actors panel ----------------------------------------
+  let customStart = null;
+  let customTarget = null;
+
+  function renderActorSearch(inputEl, listEl, excludeName, onPick) {
+    const term = inputEl.value.trim().toLowerCase();
+    if (!term) {
+      listEl.innerHTML = "";
+      return;
+    }
+    const matches = ALL_ACTORS
+      .filter((a) => a !== excludeName && a.toLowerCase().includes(term))
+      .slice(0, 30);
+    if (!matches.length) {
+      listEl.innerHTML = '<p class="empty-note">No matches.</p>';
+      return;
+    }
+    listEl.innerHTML = matches
+      .map((name, i) => '<button type="button" class="option" data-i="' + i + '">' + escapeHtml(name) + "</button>")
+      .join("");
+    Array.from(listEl.children).forEach((node, i) => {
+      node.addEventListener("click", () => onPick(matches[i]));
+    });
+  }
+
+  function validateCustomPair() {
+    el.customStartBtn.disabled = true;
+    el.customMessage.className = "custom-setup__message";
+    delete el.customStartBtn.dataset.optimal;
+
+    if (!customStart || !customTarget) {
+      el.customMessage.textContent = "";
+      return;
+    }
+    if (customStart === customTarget) {
+      el.customMessage.textContent = "Pick two different actors.";
+      el.customMessage.classList.add("custom-setup__message--error");
+      return;
+    }
+    const d = bfsDistance(customStart, customTarget);
+    if (d === 1) {
+      el.customMessage.textContent = "These two already starred together — pick a different pair.";
+      el.customMessage.classList.add("custom-setup__message--error");
+      return;
+    }
+    if (!Number.isFinite(d)) {
+      el.customMessage.textContent = "No possible connection exists between these two — pick a different pair.";
+      el.customMessage.classList.add("custom-setup__message--error");
+      return;
+    }
+    el.customMessage.textContent = "Connectable in " + d + " step" + (d === 1 ? "" : "s") + " — ready to start.";
+    el.customMessage.classList.add("custom-setup__message--ready");
+    el.customStartBtn.dataset.optimal = String(d);
+    el.customStartBtn.disabled = false;
+  }
+
+  function resetCustomSetup() {
+    customStart = null;
+    customTarget = null;
+    el.customStartChosen.hidden = true;
+    el.customStartInput.hidden = false;
+    el.customStartInput.value = "";
+    el.customStartList.innerHTML = "";
+    el.customTargetChosen.hidden = true;
+    el.customTargetInput.hidden = false;
+    el.customTargetInput.value = "";
+    el.customTargetList.innerHTML = "";
+    el.customMessage.textContent = "";
+    el.customMessage.className = "custom-setup__message";
+    el.customStartBtn.disabled = true;
+    delete el.customStartBtn.dataset.optimal;
+  }
+
+  document.getElementById("btn-custom").addEventListener("click", () => {
+    el.board.hidden = true;
+    el.customPanel.hidden = false;
+    el.customStartInput.focus();
+  });
+
+  document.getElementById("custom-cancel").addEventListener("click", () => {
+    resetCustomSetup();
+    el.customPanel.hidden = true;
+    el.board.hidden = false;
+  });
+
+  el.customStartInput.addEventListener("input", () => {
+    renderActorSearch(el.customStartInput, el.customStartList, customTarget, (name) => {
+      customStart = name;
+      el.customStartChosenName.textContent = name;
+      el.customStartChosen.hidden = false;
+      el.customStartInput.value = "";
+      el.customStartInput.hidden = true;
+      el.customStartList.innerHTML = "";
+      validateCustomPair();
+    });
+  });
+
+  el.customStartClear.addEventListener("click", () => {
+    customStart = null;
+    el.customStartChosen.hidden = true;
+    el.customStartInput.hidden = false;
+    el.customStartInput.value = "";
+    el.customStartInput.focus();
+    validateCustomPair();
+  });
+
+  el.customTargetInput.addEventListener("input", () => {
+    renderActorSearch(el.customTargetInput, el.customTargetList, customStart, (name) => {
+      customTarget = name;
+      el.customTargetChosenName.textContent = name;
+      el.customTargetChosen.hidden = false;
+      el.customTargetInput.value = "";
+      el.customTargetInput.hidden = true;
+      el.customTargetList.innerHTML = "";
+      validateCustomPair();
+    });
+  });
+
+  el.customTargetClear.addEventListener("click", () => {
+    customTarget = null;
+    el.customTargetChosen.hidden = true;
+    el.customTargetInput.hidden = false;
+    el.customTargetInput.value = "";
+    el.customTargetInput.focus();
+    validateCustomPair();
+  });
+
+  el.customStartBtn.addEventListener("click", () => {
+    const p = { start: customStart, target: customTarget, optimal: Number(el.customStartBtn.dataset.optimal) };
+    resetCustomSetup();
+    el.customPanel.hidden = true;
+    el.board.hidden = false;
+    beginPuzzle(p);
   });
 
   startNewPuzzle();
