@@ -18,7 +18,8 @@
     <p class="marquee__tag">Two actors. Zero shared credits. Shortest path wins.</p>
     <p class="howto">
       Click a title the current actor appeared in, then a co-star from that title — repeat until you reach
-      the actor on the right. Fewer movies/shows used is a better score.
+      the actor on the right. Fewer movies/shows used is a better score. Start and Reach below are picked
+      at random — tap either name to choose your own instead.
     </p>
   </header>
 
@@ -27,13 +28,25 @@
   <main class="board" id="board">
 
     <div class="plates">
-      <div class="plate plate--start">
+      <div class="plate plate--start" id="plate-start-box" role="button" tabindex="0" aria-label="Tap to pick your own start actor">
         <div class="plate__eyebrow">Start</div>
         <div class="plate__name" id="plate-start">—</div>
+        <div class="plate__hint">Tap to change</div>
+        <div class="plate__edit" id="plate-start-edit" hidden>
+          <input type="search" id="plate-start-input" placeholder="Search actor…" autocomplete="off" />
+          <div class="plate__edit-list" id="plate-start-edit-list"></div>
+          <p class="plate__edit-message" id="plate-start-edit-message"></p>
+        </div>
       </div>
-      <div class="plate plate--target">
+      <div class="plate plate--target" id="plate-target-box" role="button" tabindex="0" aria-label="Tap to pick your own reach actor">
         <div class="plate__eyebrow">Reach</div>
         <div class="plate__name" id="plate-target">—</div>
+        <div class="plate__hint">Tap to change</div>
+        <div class="plate__edit" id="plate-target-edit" hidden>
+          <input type="search" id="plate-target-input" placeholder="Search actor…" autocomplete="off" />
+          <div class="plate__edit-list" id="plate-target-edit-list"></div>
+          <p class="plate__edit-message" id="plate-target-edit-message"></p>
+        </div>
       </div>
     </div>
 
@@ -67,41 +80,7 @@
       <button type="button" class="btn" id="btn-new">New Puzzle</button>
     </div>
 
-    <button type="button" class="text-link text-link--center" id="btn-custom">Choose your own actors</button>
-
   </main>
-
-  <section class="custom-setup" id="custom-setup" hidden>
-    <p class="custom-setup__title">Pick your own two actors</p>
-    <p class="custom-setup__hint">They can't have starred in anything together — that's the puzzle.</p>
-
-    <div class="custom-setup__field">
-      <div class="custom-setup__label">Start</div>
-      <div class="custom-setup__chosen" id="custom-start-chosen" hidden>
-        <span id="custom-start-chosen-name"></span>
-        <button type="button" class="chip-clear" id="custom-start-clear" aria-label="Clear start actor">×</button>
-      </div>
-      <input type="search" id="custom-start-input" placeholder="Search actor…" autocomplete="off" />
-      <div class="custom-setup__list" id="custom-start-list"></div>
-    </div>
-
-    <div class="custom-setup__field">
-      <div class="custom-setup__label">Reach</div>
-      <div class="custom-setup__chosen" id="custom-target-chosen" hidden>
-        <span id="custom-target-chosen-name"></span>
-        <button type="button" class="chip-clear" id="custom-target-clear" aria-label="Clear reach actor">×</button>
-      </div>
-      <input type="search" id="custom-target-input" placeholder="Search actor…" autocomplete="off" />
-      <div class="custom-setup__list" id="custom-target-list"></div>
-    </div>
-
-    <p class="custom-setup__message" id="custom-setup-message"></p>
-
-    <div class="custom-setup__actions">
-      <button type="button" class="btn" id="custom-cancel">Cancel</button>
-      <button type="button" class="btn btn--primary" id="custom-start-btn" disabled>Start Puzzle</button>
-    </div>
-  </section>
 
   <div class="sprockets" aria-hidden="true"></div>
 

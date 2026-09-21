@@ -400,112 +400,65 @@
   }
   .support a:hover { color: var(--marquee-glow); }
 
-  .text-link--center {
-    display: block;
-    width: 100%;
-    text-align: center;
-    margin: 4px 0 0;
+  /* ---- inline plate editing (pick your own start/reach actor) ---- */
+  .plate {
+    cursor: pointer;
+    position: relative;
   }
-
-  /* ---- choose-your-own-actors panel ---- */
-  .custom-setup {
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-    background: var(--panel);
-    border: 1px solid var(--line);
-    border-radius: 10px;
-    padding: 20px 16px;
+  .plate:hover, .plate:focus-visible {
+    border-color: var(--marquee-glow);
+    outline: none;
   }
+  .plate--target:hover, .plate--target:focus-visible { border-color: var(--paper); }
 
-  .custom-setup__title {
-    font-family: var(--font-display);
-    font-weight: 800;
-    font-size: 1.3rem;
-    margin: 0;
-    text-align: center;
-  }
-
-  .custom-setup__hint {
-    color: var(--muted);
-    font-size: 0.85rem;
-    margin: -8px 0 0;
-    text-align: center;
-  }
-
-  .custom-setup__label {
+  .plate__hint {
     font-family: var(--font-mono);
-    font-size: 0.75rem;
-    letter-spacing: 0.06em;
+    font-size: 0.66rem;
+    letter-spacing: 0.05em;
     text-transform: uppercase;
     color: var(--muted);
-    margin-bottom: 6px;
+    margin-top: 4px;
+    opacity: 0.8;
   }
 
-  .custom-setup__field input[type="search"] {
+  .plate__edit {
+    text-align: left;
+    margin-top: 2px;
+    cursor: default;
+  }
+
+  .plate__edit input[type="search"] {
     width: 100%;
     font: inherit;
-    font-size: 0.95rem;
-    padding: 10px 12px;
+    font-size: 0.92rem;
+    padding: 8px 10px;
     border-radius: 6px;
     border: 1px solid var(--line);
     background: var(--ink);
     color: var(--paper);
   }
-  .custom-setup__field input[type="search"]:focus {
+  .plate__edit input[type="search"]:focus {
     outline: 2px solid var(--marquee);
     outline-offset: 1px;
   }
-  .custom-setup__field input[type="search"]::placeholder { color: var(--muted); }
+  .plate__edit input[type="search"]::placeholder { color: var(--muted); }
 
-  .custom-setup__list {
+  .plate__edit-list {
     display: flex;
     flex-direction: column;
-    gap: 6px;
-    max-height: 200px;
+    gap: 4px;
+    max-height: 160px;
     overflow-y: auto;
-    margin-top: 8px;
+    margin-top: 6px;
   }
+  .plate__edit-list .option { font-size: 0.85rem; padding: 8px 10px; }
 
-  .custom-setup__chosen {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-    padding: 10px 12px;
-    border-radius: 6px;
-    background: var(--velvet-soft);
-    border: 1px solid var(--velvet);
-    font-weight: 600;
-    margin-bottom: 8px;
-  }
-
-  .chip-clear {
-    font: inherit;
-    font-size: 1.1rem;
-    line-height: 1;
-    background: none;
-    border: none;
-    color: var(--muted);
-    cursor: pointer;
-    padding: 2px 4px;
-  }
-  .chip-clear:hover { color: var(--marquee-glow); }
-
-  .custom-setup__message {
-    min-height: 1.2em;
-    font-size: 0.88rem;
-    color: var(--muted);
+  .plate__edit-message {
+    min-height: 1.1em;
+    font-size: 0.76rem;
+    color: var(--velvet);
+    margin: 6px 0 0;
     text-align: center;
-    margin: 0;
-  }
-  .custom-setup__message--error { color: var(--velvet); }
-  .custom-setup__message--ready { color: var(--good); }
-
-  .custom-setup__actions {
-    display: flex;
-    gap: 10px;
-    justify-content: center;
   }
 
   [hidden] { display: none !important; }

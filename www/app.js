@@ -163,19 +163,29 @@
     winBest: document.getElementById("win-best"),
     winRevealLink: document.getElementById("win-reveal-link"),
     winOptimalChain: document.getElementById("win-optimal-chain"),
-    customPanel: document.getElementById("custom-setup"),
-    customStartInput: document.getElementById("custom-start-input"),
-    customStartList: document.getElementById("custom-start-list"),
-    customStartChosen: document.getElementById("custom-start-chosen"),
-    customStartChosenName: document.getElementById("custom-start-chosen-name"),
-    customStartClear: document.getElementById("custom-start-clear"),
-    customTargetInput: document.getElementById("custom-target-input"),
-    customTargetList: document.getElementById("custom-target-list"),
-    customTargetChosen: document.getElementById("custom-target-chosen"),
-    customTargetChosenName: document.getElementById("custom-target-chosen-name"),
-    customTargetClear: document.getElementById("custom-target-clear"),
-    customMessage: document.getElementById("custom-setup-message"),
-    customStartBtn: document.getElementById("custom-start-btn"),
+  };
+
+  // Both plates share this shape — keyed by "start"/"target" so the same
+  // open/close/commit logic works for either side.
+  const plates = {
+    start: {
+      box: document.getElementById("plate-start-box"),
+      name: document.getElementById("plate-start"),
+      hint: document.querySelector("#plate-start-box .plate__hint"),
+      edit: document.getElementById("plate-start-edit"),
+      input: document.getElementById("plate-start-input"),
+      list: document.getElementById("plate-start-edit-list"),
+      message: document.getElementById("plate-start-edit-message"),
+    },
+    target: {
+      box: document.getElementById("plate-target-box"),
+      name: document.getElementById("plate-target"),
+      hint: document.querySelector("#plate-target-box .plate__hint"),
+      edit: document.getElementById("plate-target-edit"),
+      input: document.getElementById("plate-target-input"),
+      list: document.getElementById("plate-target-edit-list"),
+      message: document.getElementById("plate-target-edit-message"),
+    },
   };
 
   function usedActors() {
@@ -369,139 +379,106 @@
     el.winRevealLink.hidden = true;
   });
 
-  // ---- choose-your-own-actors panel ----------------------------------------
-  let customStart = null;
-  let customTarget = null;
+  // ---- inline plate editing (tap Start or Reach to pick your own actor) ----
+  // Each plate edits independently and commits immediately on a valid pick —
+  // no separate "confirm" step. Picking one side keeps whatever the other
+  // side currently shows (random or previously chosen).
+  let openSide = null;
 
-  function renderActorSearch(inputEl, listEl, excludeName, onPick) {
-    const term = inputEl.value.trim().toLowerCase();
+  function otherSide(side) {
+    return side === "start" ? "target" : "start";
+  }
+
+  function openPlateEditor(side) {
+    if (openSide === side) return;
+    if (openSide) closePlateEditor(openSide);
+    openSide = side;
+    const p = plates[side];
+    p.name.hidden = true;
+    p.hint.hidden = true;
+    p.edit.hidden = false;
+    p.input.value = "";
+    p.list.innerHTML = "";
+    p.message.textContent = "";
+    p.input.focus();
+  }
+
+  function closePlateEditor(side) {
+    const p = plates[side];
+    p.edit.hidden = true;
+    p.name.hidden = false;
+    p.hint.hidden = false;
+    p.input.value = "";
+    p.list.innerHTML = "";
+    p.message.textContent = "";
+    if (openSide === side) openSide = null;
+  }
+
+  function renderPlateSearch(side) {
+    const p = plates[side];
+    const term = p.input.value.trim().toLowerCase();
+    const exclude = puzzle[otherSide(side)];
     if (!term) {
-      listEl.innerHTML = "";
+      p.list.innerHTML = "";
       return;
     }
     const matches = ALL_ACTORS
-      .filter((a) => a !== excludeName && a.toLowerCase().includes(term))
+      .filter((a) => a !== exclude && a.toLowerCase().includes(term))
       .slice(0, 30);
     if (!matches.length) {
-      listEl.innerHTML = '<p class="empty-note">No matches.</p>';
+      p.list.innerHTML = '<p class="empty-note">No matches.</p>';
       return;
     }
-    listEl.innerHTML = matches
+    p.list.innerHTML = matches
       .map((name, i) => '<button type="button" class="option" data-i="' + i + '">' + escapeHtml(name) + "</button>")
       .join("");
-    Array.from(listEl.children).forEach((node, i) => {
-      node.addEventListener("click", () => onPick(matches[i]));
+    Array.from(p.list.children).forEach((node, i) => {
+      node.addEventListener("click", () => commitPlatePick(side, matches[i]));
     });
   }
 
-  function validateCustomPair() {
-    el.customStartBtn.disabled = true;
-    el.customMessage.className = "custom-setup__message";
-    delete el.customStartBtn.dataset.optimal;
-
-    if (!customStart || !customTarget) {
-      el.customMessage.textContent = "";
+  function commitPlatePick(side, name) {
+    const p = plates[side];
+    const other = puzzle[otherSide(side)];
+    if (name === other) {
+      p.message.textContent = "Pick someone different from the other name.";
       return;
     }
-    if (customStart === customTarget) {
-      el.customMessage.textContent = "Pick two different actors.";
-      el.customMessage.classList.add("custom-setup__message--error");
-      return;
-    }
-    const d = bfsDistance(customStart, customTarget);
+    const d = bfsDistance(name, other);
     if (d === 1) {
-      el.customMessage.textContent = "These two already starred together — pick a different pair.";
-      el.customMessage.classList.add("custom-setup__message--error");
+      p.message.textContent = "They already starred together — try someone else.";
       return;
     }
     if (!Number.isFinite(d)) {
-      el.customMessage.textContent = "No possible connection exists between these two — pick a different pair.";
-      el.customMessage.classList.add("custom-setup__message--error");
+      p.message.textContent = "No connection exists between these two — try someone else.";
       return;
     }
-    el.customMessage.textContent = "Connectable in " + d + " step" + (d === 1 ? "" : "s") + " — ready to start.";
-    el.customMessage.classList.add("custom-setup__message--ready");
-    el.customStartBtn.dataset.optimal = String(d);
-    el.customStartBtn.disabled = false;
+    const newPuzzle = side === "start"
+      ? { start: name, target: other, optimal: d }
+      : { start: other, target: name, optimal: d };
+    closePlateEditor(side);
+    beginPuzzle(newPuzzle);
   }
 
-  function resetCustomSetup() {
-    customStart = null;
-    customTarget = null;
-    el.customStartChosen.hidden = true;
-    el.customStartInput.hidden = false;
-    el.customStartInput.value = "";
-    el.customStartList.innerHTML = "";
-    el.customTargetChosen.hidden = true;
-    el.customTargetInput.hidden = false;
-    el.customTargetInput.value = "";
-    el.customTargetList.innerHTML = "";
-    el.customMessage.textContent = "";
-    el.customMessage.className = "custom-setup__message";
-    el.customStartBtn.disabled = true;
-    delete el.customStartBtn.dataset.optimal;
-  }
-
-  document.getElementById("btn-custom").addEventListener("click", () => {
-    el.board.hidden = true;
-    el.customPanel.hidden = false;
-    el.customStartInput.focus();
-  });
-
-  document.getElementById("custom-cancel").addEventListener("click", () => {
-    resetCustomSetup();
-    el.customPanel.hidden = true;
-    el.board.hidden = false;
-  });
-
-  el.customStartInput.addEventListener("input", () => {
-    renderActorSearch(el.customStartInput, el.customStartList, customTarget, (name) => {
-      customStart = name;
-      el.customStartChosenName.textContent = name;
-      el.customStartChosen.hidden = false;
-      el.customStartInput.value = "";
-      el.customStartInput.hidden = true;
-      el.customStartList.innerHTML = "";
-      validateCustomPair();
+  Object.keys(plates).forEach((side) => {
+    const p = plates[side];
+    p.box.addEventListener("click", () => openPlateEditor(side));
+    p.box.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        openPlateEditor(side);
+      }
     });
+    p.input.addEventListener("click", (e) => e.stopPropagation());
+    p.input.addEventListener("input", () => renderPlateSearch(side));
   });
 
-  el.customStartClear.addEventListener("click", () => {
-    customStart = null;
-    el.customStartChosen.hidden = true;
-    el.customStartInput.hidden = false;
-    el.customStartInput.value = "";
-    el.customStartInput.focus();
-    validateCustomPair();
+  document.addEventListener("click", (e) => {
+    if (!openSide) return;
+    if (!plates[openSide].box.contains(e.target)) closePlateEditor(openSide);
   });
-
-  el.customTargetInput.addEventListener("input", () => {
-    renderActorSearch(el.customTargetInput, el.customTargetList, customStart, (name) => {
-      customTarget = name;
-      el.customTargetChosenName.textContent = name;
-      el.customTargetChosen.hidden = false;
-      el.customTargetInput.value = "";
-      el.customTargetInput.hidden = true;
-      el.customTargetList.innerHTML = "";
-      validateCustomPair();
-    });
-  });
-
-  el.customTargetClear.addEventListener("click", () => {
-    customTarget = null;
-    el.customTargetChosen.hidden = true;
-    el.customTargetInput.hidden = false;
-    el.customTargetInput.value = "";
-    el.customTargetInput.focus();
-    validateCustomPair();
-  });
-
-  el.customStartBtn.addEventListener("click", () => {
-    const p = { start: customStart, target: customTarget, optimal: Number(el.customStartBtn.dataset.optimal) };
-    resetCustomSetup();
-    el.customPanel.hidden = true;
-    el.board.hidden = false;
-    beginPuzzle(p);
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && openSide) closePlateEditor(openSide);
   });
 
   startNewPuzzle();
